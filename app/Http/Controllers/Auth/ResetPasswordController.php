@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Auth;
+use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 
@@ -36,4 +38,26 @@ class ResetPasswordController extends Controller
     {
         $this->middleware('guest');
     }
+
+    /**
+     * Get the response for a successful password reset.
+     *
+     * @param  string  $response
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function sendResetResponse($response)
+    {
+        // if(!$this->guard()->user()->active)
+        if(!Auth::User()->active)
+        {
+            Auth::logout();
+
+            return redirect('/login')->withInfo('Your Password Has been changed but you still need to activate your account');
+        }
+
+        return redirect($this->redirectPath())
+                            ->with('status', trans($response));
+    }
+
+
 }
